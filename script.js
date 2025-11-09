@@ -1,103 +1,194 @@
-const subjects = {
-"AIML_1_1": ["M1", "Physics", "BEE", "EG", "C"],
-"CSE_1_1": ["M1", "Physics", "BEE", "EG", "C"],
-"CY_1_1": ["M1", "Physics", "BEE", "EG", "C"],
-"DS_1_1": ["M1", "Physics", "BEE", "EG", "C"],
-"ECE_1_1": ["M1", "Chemistry", "English", "EC", "C", "ES"],
-"EEE_1_1": ["M1", "Chemistry", "English", "EC", "C", "ES"],
-"ME_1_1": ["M1", "Chemistry", "English", "EM", "C", "ES"],
-"CE_1_1": ["M1", "Chemistry", "English", "EC", "C", "ES"],
-"AIML_1_2": ["M2", "Chemistry", "English", "DE", "Python","ES"],
-"CSE_1_2": ["M2", "Chemistry", "English", "DE", "Python","ES"],
-"CY_1_2": ["M2", "Chemistry", "English", "DE", "Python","ES"],
-"DS_1_2": ["M2", "Chemistry", "English", "DE", "Python","ES"],
-"EEE_1_2": ["M2", "Physics", "EDC", "EG", "Python"],
-"ECE_1_2": ["M2", "Physics", "EDC", "EG", "Python"],
-"ME_1_2": ["M2", "Physics", "BEE", "EG", "Python", "ES"],
-"CE_1_2": ["M2", "Physics", "BEE", "EG", "Pyhton"],
-"AIML_2_1": ["M3", "Data Structures & Algorithms", "UNIX Programming", "Intro of AI", "Professional Ethics and Human Values"],
-"AIML_2_2": ["M4", "Advanced English for Engineers", "Advanced Data Structues", "Java Programming", "Operating System","Artificial Intelligence"]
-};
+// Init immediately (works in CodePen or standalone)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 
-const docLinks = {
-"M1": "https://drive.google.com/uc?export=download&id=1uH1re21YAQyXEzBeHKB_0xFzTcUFNZoz",
-"Physics": "https://drive.google.com/uc?export=download&id=1OaAwotmOL-0Va9M7tJ2xlawQlJFES6xl",
-"BEE": "https://drive.google.com/uc?export=download&id=1aMTRzvd2ipUHIqIcLGbT8FGvkZ0Cr8c8",
-"EG": "https://drive.google.com/uc?export=download&id=1Ml578a5rIwh_ukqNt40p4S1gQb0wZan6",
-"C": "https://drive.google.com/uc?export=download&id=",
-"M2": "https://drive.google.com/uc?export=download&id=",
-"Chemistry": "https://drive.google.com/uc?export=download&id=",
-"DE": "https://drive.google.com/uc?export=download&id=",
-"English": "https://drive.google.com/uc?export=download&id=",
-"Python": "https://drive.google.com/uc?export=download&id=",
-"ES": "https://drive.google.com/uc?export=download&id=",
-"EDC": "https://drive.google.com/uc?export=download&id=",
-"EC": "https://drive.google.com/uc?export=download&id=",
-"EM": "https://drive.google.com/uc?export=download&id="
-};
+function init(){
+  const RESTORE_THRESHOLD = 20;
+  const state = {
+    mode: 'home',
+    inAnim: false,
+    programmaticScroll: false,
+    aimlYear: null, // '1st' | '2nd' | '3rd' | '4th'
+    aimlSem: null   // '1' | '2'
+  };
 
-function updateSubjects() {
-  const branch = document.getElementById("branchSelect").value;
-  const year = document.getElementById("yearSelect").value;
-  const sem = document.getElementById("semSelect").value;
-  const subjectSelect = document.getElementById("subjectSelect");
+  // Convert Google Drive "file/d/ID/view" → direct download
+  const driveUrl = (input)=>{
+    const s = String(input || '');
+    const m = s.match(/\/d\/([^/]+)/) || s.match(/[?&]id=([^&]+)/);
+    const id = m ? m[1] : null;
+    return id ? `https://drive.google.com/uc?export=download&id=${id}` : s;
+  };
 
-  subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+  // Your Drive links (replace placeholders)
+  const SUBJECT_URLS = {
+    'AIML|1st|1': {
+      'Mathematics-1': driveUrl('https://drive.google.com/file/d/1uH1re21YAQyXEzBeHKB_0xFzTcUFNZoz/view?usp=drive_link'),
+      'Physics'      : driveUrl('https://drive.google.com/file/d/1OaAwotmOL-0Va9M7tJ2xlawQlJFES6xl/view?usp=drive_link'),
+      'BEE'          : driveUrl('https://drive.google.com/file/d/1aMTRzvd2ipUHIqIcLGbT8FGvkZ0Cr8c8/view?usp=drive_link'),
+      'EG'           : driveUrl('https://drive.google.com/file/d/1Ml578a5rIwh_ukqNt40p4S1gQb0wZan6/view?usp=drive_link'),
+      'C'            : driveUrl('https://drive.google.com/file/d/1UVWXY56789abcdef01234/view?usp=sharing')
+    }
+  };
 
-  const key = `${branch}_${year}_${sem}`;
-  const subjectList = subjects[key];
-
-  if (subjectList) {
-    subjectList.forEach(subject => {
-      const option = document.createElement("option");
-      option.value = subject;
-      option.textContent = subject;
-      subjectSelect.appendChild(option);
+  const setActiveView = (id)=>{
+    ['view-home','view-anu','view-btech','view-aiml-year','view-aiml-sem','view-aiml-subjects'].forEach(v=>{
+      const el = document.getElementById(v);
+      if (!el) return;
+      el.classList.toggle('active', v === id);
     });
+  };
+  const scrollToEl = (el)=>{
+    if (!el) return;
+    state.programmaticScroll = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(()=>{ state.programmaticScroll = false; }, 600);
+  };
+
+  function animateToANU(){
+    if (state.inAnim || state.mode !== 'home') return;
+    state.inAnim = true;
+    document.body.classList.add('transitioning');
+    setTimeout(()=>{
+      document.body.classList.remove('transitioning');
+      document.body.classList.add('mode-anu');
+      setActiveView('view-anu');
+      state.mode = 'anu';
+      scrollToEl(document.querySelector('#view-anu .programs'));
+      state.inAnim = false;
+    },520);
   }
+  function goBTech(){
+    if (state.inAnim) return;
+    document.body.classList.add('mode-anu');
+    setActiveView('view-btech');
+    state.mode = 'btech';
+    scrollToEl(document.querySelector('#view-btech .dep-grid'));
+  }
+  function goAimlYear(){
+    if (state.inAnim) return;
+    setActiveView('view-aiml-year');
+    state.mode = 'aiml-year';
+    scrollToEl(document.querySelector('#view-aiml-year .choice-form'));
+  }
+  function goAimlSem(){
+    if (state.inAnim) return;
+    document.getElementById('aiml-year-label').textContent = `${state.aimlYear} Year`;
+    setActiveView('view-aiml-sem');
+    state.mode = 'aiml-sem';
+    scrollToEl(document.querySelector('#view-aiml-sem .choice-form'));
+  }
+  function goAimlSubjects(){
+    if (state.inAnim) return;
+    document.getElementById('subjects-title').textContent =
+      `AIML — ${state.aimlYear} Year — Semester ${state.aimlSem} — Subjects`;
+    setActiveView('view-aiml-subjects');
+    state.mode = 'aiml-subjects';
+    scrollToEl(document.querySelector('#view-aiml-subjects .subject-grid'));
+  }
+  function animateToHome(){
+    if (state.inAnim || state.mode === 'home') return;
+    state.inAnim = true;
+    setActiveView('view-home');
+    document.body.classList.add('transitioning-back');
+    document.body.classList.remove('mode-anu');
+    setTimeout(()=>{
+      document.body.classList.remove('transitioning-back');
+      state.mode = 'home';
+      state.programmaticScroll = true;
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      setTimeout(()=>{ state.programmaticScroll = false; },150);
+      state.inAnim = false;
+    },520);
+  }
+
+  // Nav & cards
+  document.getElementById('btn-anu')?.addEventListener('click', e=>{ e.preventDefault(); animateToANU(); });
+  document.getElementById('btn-jntuk')?.addEventListener('click', e=>{ e.preventDefault(); alert('JNTUK — Coming soon'); });
+  document.getElementById('btn-rvrjc')?.addEventListener('click', e=>{ e.preventDefault(); alert('RVRJC — Coming soon'); });
+
+  document.getElementById('open-btech')?.addEventListener('click', e=>{ e.preventDefault(); goBTech(); });
+  document.getElementById('open-mtech')?.addEventListener('click', e=>{ e.preventDefault(); alert('M.Tech — coming soon'); });
+  document.getElementById('back-anu')?.addEventListener('click', e=>{
+    e.preventDefault(); setActiveView('view-anu'); state.mode='anu';
+    scrollToEl(document.querySelector('#view-anu .programs'));
+  });
+
+  document.querySelectorAll('.dep-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      e.preventDefault();
+      const dept = btn.textContent.trim();
+      if (dept === 'AIML') goAimlYear();
+      else alert(`${dept} — coming soon`);
+    });
+  });
+
+  // YEAR form (mobile-safe: label contains input)
+  const yearForm = document.getElementById('aiml-year-form');
+  yearForm?.addEventListener('submit', e=>{
+    e.preventDefault();
+    const checked = yearForm.querySelector('input[name="year"]:checked');
+    if (!checked) { alert('Please select a year'); return; }
+    const map = {'1':'1st','2':'2nd','3':'3rd','4':'4th'};
+    state.aimlYear = map[checked.value] || `${checked.value}th`;
+    goAimlSem();
+  });
+  document.getElementById('back-btech')?.addEventListener('click', e=>{ e.preventDefault(); goBTech(); });
+
+  // SEM form
+  const semForm = document.getElementById('aiml-sem-form');
+  semForm?.addEventListener('submit', e=>{
+    e.preventDefault();
+    const checked = semForm.querySelector('input[name="semester"]:checked');
+    if (!checked) { alert('Please select a semester'); return; }
+    state.aimlSem = checked.value;
+    if (state.aimlYear === '1st' && state.aimlSem === '1') goAimlSubjects();
+    else alert(`Subjects for ${state.aimlYear} Year, Semester ${state.aimlSem} — coming soon`);
+  });
+  document.getElementById('back-aiml-year')?.addEventListener('click', e=>{ e.preventDefault(); goAimlYear(); });
+  document.getElementById('back-aiml-sem')?.addEventListener('click', e=>{ e.preventDefault(); goAimlSem(); });
+
+  // Topbar + Sidebar nav
+  document.querySelectorAll('#topbar .nav a').forEach(a=>{
+    a.addEventListener('click', e=>{
+      const route = a.dataset.route;
+      if (!route || route==='home'){ e.preventDefault(); animateToHome(); return; }
+      e.preventDefault(); alert(`${route.toUpperCase()} page coming soon`);
+    });
+  });
+  document.querySelectorAll('#sidebar .side-nav a, #sidebar .brand').forEach(a=>{
+    a.addEventListener('click', e=>{
+      const route = a.dataset.route;
+      if (!route || route==='home'){ e.preventDefault(); animateToHome(); return; }
+      e.preventDefault(); alert(`${route.toUpperCase()} page coming soon`);
+    });
+  });
+
+  // Restore home at top
+  window.addEventListener('scroll', ()=>{
+    if (state.programmaticScroll || state.inAnim) return;
+    if (state.mode!=='home' && window.scrollY <= RESTORE_THRESHOLD) animateToHome();
+  });
+
+  // Subject download
+  function triggerDownload(url, filename){
+    const a = document.createElement('a');
+    a.href = url; a.download = filename || ''; a.rel = 'noopener'; a.target = '_self';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+  document.querySelectorAll('#subjects-grid .subject-card').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const subject = btn.dataset.subject;
+      const key = `AIML|${state.aimlYear}|${state.aimlSem}`;
+      const url = SUBJECT_URLS[key]?.[subject];
+      if (!url){ alert(`No Drive link set for ${subject} (${key}).`); return; }
+      triggerDownload(url, `${subject}.pdf`);
+    });
+  });
+
+  // Footer year
+  document.getElementById('year').textContent = new Date().getFullYear();
 }
-
-document.getElementById("branchSelect").addEventListener("change", updateSubjects);
-document.getElementById("yearSelect").addEventListener("change", updateSubjects);
-document.getElementById("semSelect").addEventListener("change", updateSubjects);
-function showDocuments() {
-  const subject = document.getElementById("subjectSelect").value;
-  const docList = document.getElementById("docList");
-
-  docList.innerHTML = ""; // Clear previous results
-
-  if (!subject) {
-    alert("Please select a subject");
-    return;
-  }
-
-  const link = docLinks[subject];
-
-  const li = document.createElement("li");
-
-  if (link) {
-    li.innerHTML = `${subject} Paper — <a href="${link}" download>Download</a>`;
-  } else {
-    li.textContent = `No document available for ${subject}`;
-  }
-
-  docList.appendChild(li);
-  document.getElementById("documents").style.display = "block";
-}
-
-function toggleTheme() {
-  const body = document.body;
-  if (body.classList.contains("dark-mode")) {
-    body.classList.remove("dark-mode");
-    body.classList.add("light-mode");
-  } else {
-    body.classList.remove("light-mode");
-    body.classList.add("dark-mode");
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.body.classList.add("dark-mode"); // default mode
-  document.getElementById("themeSwitch").checked = false;
-});
-
