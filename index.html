@@ -14,46 +14,73 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
- 
+
   <!-- SUBJECT VIEWER -->
   <div id="subject-viewer" class="subject-viewer" aria-hidden="true">
     <div class="subject-viewer-bar">
       <button id="close-subject-viewer" class="back-btn">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
         Close
       </button>
       <span id="subject-viewer-title"></span>
     </div>
     <iframe id="subject-viewer-frame" title="Subject Content"></iframe>
   </div>
- 
-  <!-- HEADER (home only) -->
+
+  <!-- ======== TOPBAR ======== -->
   <header class="site-header" id="topbar">
+    <!-- Main nav row -->
     <div class="nav-inner">
       <a class="nav-brand" href="#" data-route="home">
         <div class="nav-logo"><span>L</span></div>
         <span class="nav-brand-name">Lurniqo</span>
       </a>
+      <!-- Desktop nav links (hidden on mobile) -->
       <nav class="nav" aria-label="Primary">
-        <a href="#" data-route="home">Home</a>
-        <a href="#" data-route="notifications">Notifications</a>
-        <a href="#" data-route="about">About</a>
+        <a href="#" data-route="home" class="nav-link">Home</a>
+        <a href="#" data-route="syllabus" class="nav-link">Syllabus</a>
+        <a href="#" data-route="notifications" class="nav-link">Notifications</a>
+        <a href="#" data-route="about" class="nav-link">About</a>
       </nav>
+      <!-- Mobile hamburger button (hidden on desktop) -->
+      <button class="hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </div>
   </header>
- 
-  <!-- SIDEBAR (inside ANU views) -->
+
+  <!-- ======== MOBILE MENU OVERLAY ======== -->
+  <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+    <div class="mobile-menu-inner">
+      <div class="mobile-menu-top">
+        <div class="nav-brand">
+          <div class="nav-logo"><span>L</span></div>
+          <span class="nav-brand-name">Lurniqo</span>
+        </div>
+        <button class="hamburger hamburger--open" id="close-menu-btn" aria-label="Close menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <nav class="mobile-nav" aria-label="Mobile navigation">
+        <a href="#" data-route="home" class="mobile-nav-link">Home</a>
+        <a href="#" data-route="syllabus" class="mobile-nav-link">Syllabus</a>
+        <a href="#" data-route="notifications" class="mobile-nav-link">Notifications</a>
+        <a href="#" data-route="about" class="mobile-nav-link">About</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ======== SIDEBAR (ANU mode desktop) ======== -->
   <aside class="sidebar" id="sidebar" aria-label="Sidebar navigation">
     <a class="brand" href="#" data-route="home" aria-label="Go home">
       <div class="logo-badge"><span>L</span></div>
     </a>
- 
     <nav class="side-nav" aria-label="Primary">
       <a href="#" data-route="home" title="Home" class="side-link">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </a>
       <a href="#" data-route="syllabus" title="Syllabus" class="side-link">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
       </a>
       <a href="#" data-route="notifications" title="Notifications" class="side-link">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -63,17 +90,14 @@
       </a>
     </nav>
   </aside>
- 
+
   <!-- ======== HOME VIEW ======== -->
   <main id="view-home" class="view active">
     <div class="home-hero">
-      <div class="logo-tile">
-        <span>L</span>
-      </div>
+      <div class="logo-tile"><span>L</span></div>
       <h1 class="home-title">Lurniqo</h1>
       <p class="home-sub">Your academic portal, simplified.</p>
     </div>
- 
     <div class="portal-grid">
       <a class="portal-btn" id="btn-anu" href="#">
         <div class="portal-icon">
@@ -87,7 +111,7 @@
       </a>
     </div>
   </main>
- 
+
   <!-- ======== ANU VIEW ======== -->
   <section id="view-anu" class="view content-offset">
     <div class="page-hero" id="anu-anchor">
@@ -104,7 +128,7 @@
       </a>
     </div>
   </section>
- 
+
   <!-- ======== BTECH DEPARTMENTS ======== -->
   <section id="view-btech" class="view content-offset">
     <div class="bar" id="btech-anchor">
@@ -115,41 +139,17 @@
       <h2 class="view-title">B.Tech Departments</h2>
     </div>
     <div class="dep-grid">
-      <a class="dep-btn" href="#" data-dept="AIML">
-        <span class="dep-tag">AIML</span>
-        <span class="dep-full">AI &amp; Machine Learning</span>
-      </a>
-      <a class="dep-btn" href="#" data-dept="CSE">
-        <span class="dep-tag">CSE</span>
-        <span class="dep-full">Computer Science</span>
-      </a>
-      <a class="dep-btn" href="#" data-dept="DS">
-        <span class="dep-tag">DS</span>
-        <span class="dep-full">Data Science</span>
-      </a>
-      <a class="dep-btn" href="#" data-dept="CY">
-        <span class="dep-tag">CY</span>
-        <span class="dep-full">Cyber Security</span>
-      </a>
-      <a class="dep-btn" href="#" data-dept="ME">
-        <span class="dep-tag">ME</span>
-        <span class="dep-full">Mechanical Engg.</span>
-      </a>
-      <a class="dep-btn" href="#" data-dept="CE">
-        <span class="dep-tag">CE</span>
-        <span class="dep-full">Civil Engg.</span>
-      </a>
-      <a class="dep-btn" href="#" data-dept="EEE">
-        <span class="dep-tag">EEE</span>
-        <span class="dep-full">Electrical Engg.</span>
-      </a>
-      <a class="dep-btn" href="#" data-dept="ECE">
-        <span class="dep-tag">ECE</span>
-        <span class="dep-full">Electronics &amp; Comm.</span>
-      </a>
+      <a class="dep-btn" href="#" data-dept="AIML"><span class="dep-tag">AIML</span><span class="dep-full">AI &amp; Machine Learning</span></a>
+      <a class="dep-btn" href="#" data-dept="CSE"><span class="dep-tag">CSE</span><span class="dep-full">Computer Science</span></a>
+      <a class="dep-btn" href="#" data-dept="DS"><span class="dep-tag">DS</span><span class="dep-full">Data Science</span></a>
+      <a class="dep-btn" href="#" data-dept="CY"><span class="dep-tag">CY</span><span class="dep-full">Cyber Security</span></a>
+      <a class="dep-btn" href="#" data-dept="ME"><span class="dep-tag">ME</span><span class="dep-full">Mechanical Engg.</span></a>
+      <a class="dep-btn" href="#" data-dept="CE"><span class="dep-tag">CE</span><span class="dep-full">Civil Engg.</span></a>
+      <a class="dep-btn" href="#" data-dept="EEE"><span class="dep-tag">EEE</span><span class="dep-full">Electrical Engg.</span></a>
+      <a class="dep-btn" href="#" data-dept="ECE"><span class="dep-tag">ECE</span><span class="dep-full">Electronics &amp; Comm.</span></a>
     </div>
   </section>
- 
+
   <!-- ======== YEAR SELECTION ======== -->
   <section id="view-dept-year" class="view content-offset">
     <div class="bar" id="year-anchor">
@@ -167,7 +167,7 @@
       <button type="submit" class="submit-btn">Continue →</button>
     </form>
   </section>
- 
+
   <!-- ======== SEMESTER SELECTION ======== -->
   <section id="view-dept-sem" class="view content-offset">
     <div class="bar" id="sem-anchor">
@@ -179,13 +179,13 @@
         <span id="dept-sem-heading">Department</span> — <span id="dept-year-label">Year</span> — Semester
       </h2>
     </div>
-    <form id="dept-sem-form" class="choice-form" id="sem-anchor">
+    <form id="dept-sem-form" class="choice-form">
       <label class="choice-option"><input type="radio" name="semester" value="1"><span>Semester 1</span></label>
       <label class="choice-option"><input type="radio" name="semester" value="2"><span>Semester 2</span></label>
       <button type="submit" class="submit-btn">Continue →</button>
     </form>
   </section>
- 
+
   <!-- ======== SUBJECTS ======== -->
   <section id="view-dept-subjects" class="view content-offset">
     <div class="bar" id="subjects-anchor">
@@ -197,7 +197,7 @@
     </div>
     <div class="subject-grid" id="subjects-grid"></div>
   </section>
- 
+
   <!-- ======== ABOUT VIEW ======== -->
   <section id="view-about" class="view content-offset">
     <div class="about-glass">
@@ -206,40 +206,31 @@
         <h1>Lurniqoo</h1>
         <p class="about-tagline">A modern academic ecosystem built to simplify learning.</p>
       </header>
- 
       <div class="about-section reveal">
         <h2>Introduction</h2>
         <p>Lurniqoo is a student-focused learning platform designed to simplify access to syllabi, study materials, and structured academic resources. It helps university students quickly find what they need without confusion or delay.</p>
         <p>By organizing content by department, year, semester, and subject, Lurniqoo brings clarity to the academic journey and reduces the stress of searching across scattered platforms.</p>
       </div>
- 
       <div class="about-section reveal">
         <h2>Vision &amp; Purpose</h2>
         <div class="vision-grid">
           <div class="vision-card">
-            <div class="vision-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            </div>
+            <div class="vision-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
             <h3>Accessibility</h3>
             <p>Academic resources available anytime, anywhere, without complex processes.</p>
           </div>
           <div class="vision-card">
-            <div class="vision-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-            </div>
+            <div class="vision-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
             <h3>Organization</h3>
             <p>Materials structured by department, year, semester, and subject.</p>
           </div>
           <div class="vision-card">
-            <div class="vision-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            </div>
+            <div class="vision-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
             <h3>Growth</h3>
             <p>Continuously evolves with notes, features, and tools to support students.</p>
           </div>
         </div>
       </div>
- 
       <div class="about-section reveal">
         <h2>Platform Features</h2>
         <ul class="feature-list">
@@ -250,36 +241,24 @@
           <li>Secure document viewing</li>
         </ul>
       </div>
- 
       <div class="about-section reveal">
         <h2>Learning &amp; Notes System</h2>
         <p>Lurniqoo is expanding into a full learning environment with structured academic notes designed for concept clarity and exam preparation. Notes will be organized by subject and unit, helping students study efficiently and confidently.</p>
       </div>
- 
       <div class="about-section reveal">
         <h2>Future Roadmap</h2>
         <div class="timeline">
-          <div class="timeline-item active-item">
-            <span class="timeline-tag now">Now</span>
-            <p>Centralized syllabus access</p>
-          </div>
-          <div class="timeline-item">
-            <span class="timeline-tag next">Next</span>
-            <p>Structured academic notes</p>
-          </div>
-          <div class="timeline-item">
-            <span class="timeline-tag future">Future</span>
-            <p>Personal dashboards &amp; progress tracking</p>
-          </div>
+          <div class="timeline-item active-item"><span class="timeline-tag now">Now</span><p>Centralized syllabus access</p></div>
+          <div class="timeline-item"><span class="timeline-tag next">Next</span><p>Structured academic notes</p></div>
+          <div class="timeline-item"><span class="timeline-tag future">Future</span><p>Personal dashboards &amp; progress tracking</p></div>
         </div>
       </div>
- 
       <footer class="about-footer reveal">
         <p><strong>Lurniqoo</strong> is not just a website — it is a growing academic ecosystem built to make education simpler, organized, and accessible.</p>
       </footer>
     </div>
   </section>
- 
+
   <!-- ======== NOTIFICATIONS VIEW ======== -->
   <section id="view-notifications" class="view content-offset">
     <div class="about-glass notif-glass">
@@ -298,12 +277,12 @@
       </ul>
     </div>
   </section>
- 
+
   <!-- FOOTER -->
   <footer class="site-footer">
     <span>© <span id="year"></span> Lurniqo. All rights reserved.</span>
   </footer>
- 
+
   <script src="./script.js"></script>
 </body>
 </html>
