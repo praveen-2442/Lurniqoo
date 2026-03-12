@@ -5,12 +5,18 @@
   const el  = id => document.getElementById(id);
   const qs  = sel => document.querySelector(sel);
 
-  function scrollToTop() {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+  function scrollToTop(viewId) {
+    // Instant snap first, then smooth scroll after layout settles
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    setTimeout(() => {
+      const view = viewId ? el(viewId) : null;
+      if (view) {
+        view.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    });
+      }
+    }, 60);
   }
 
   /* ─── STATE ───────────────────────────────── */
@@ -48,7 +54,7 @@
     document.body.classList.toggle('mode-anu', !isHome);
 
     updateSideLink(sideRoute || null);
-    scrollToTop();
+    scrollToTop(viewId);
   }
 
   /* ─── NAV ACTIONS ─────────────────────────── */
