@@ -5,22 +5,41 @@
   const el  = id => document.getElementById(id);
   const qs  = sel => document.querySelector(sel);
 
-  function scrollToTop(viewId) {
-    // Instant snap first, then smooth scroll after layout settles
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-    setTimeout(() => {
-      const view = viewId ? el(viewId) : null;
-      if (view) {
-        view.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
+  function scrollToTop() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }, 60);
+      });
+    });
   }
 
   /* ─── STATE ───────────────────────────────── */
   const state = { dept: null, year: null, sem: null };
+
+  /* ─── MOBILE MENU ─────────────────────────── */
+  const hamburgerBtn = el('hamburger-btn');
+  const closeMenuBtn = el('close-menu-btn');
+  const mobileMenu   = el('mobile-menu');
+
+  function openMenu() {
+    mobileMenu.classList.add('open');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    hamburgerBtn?.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    mobileMenu?.classList.remove('open');
+    mobileMenu?.setAttribute('aria-hidden', 'true');
+    hamburgerBtn?.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  function updateMobileActiveLink(route) {
+    document.querySelectorAll('.mobile-nav-link').forEach(a => {
+      a.classList.toggle('mob-active', a.dataset.route === route);
+    });
+  }
 
   /* ─── VIEW IDs ────────────────────────────── */
   const ALL_VIEWS = [
@@ -39,7 +58,27 @@
     document.querySelectorAll('.side-link').forEach(a => {
       a.classList.toggle('active', a.dataset.route === route);
     });
+    // sync mobile bottom nav
+    document.querySelectorAll('.mob-item').forEach(a => {
+      a.classList.toggle('mob-active', a.dataset.mob === route);
+    });
+    // sync desktop topbar nav links
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.classList.toggle('active', a.dataset.route === route);
+    });
   }
+
+  /* ─── LIVE CLOCK ─────────────────────────── */
+  function updateClock() {
+    const t = el('status-time');
+    if (!t) return;
+    const now = new Date();
+    const h   = now.getHours();
+    const m   = String(now.getMinutes()).padStart(2, '0');
+    t.textContent = h + ':' + m;
+  }
+  updateClock();
+  setInterval(updateClock, 30000);
 
   /* ─── SET ACTIVE VIEW ─────────────────────── */
   function setActiveView(viewId, sideRoute) {
@@ -54,7 +93,9 @@
     document.body.classList.toggle('mode-anu', !isHome);
 
     updateSideLink(sideRoute || null);
-    scrollToTop(viewId);
+    updateMobileActiveLink(sideRoute || null);
+    closeMenu();
+    scrollToTop();
   }
 
   /* ─── NAV ACTIONS ─────────────────────────── */
@@ -288,6 +329,13 @@
 
     targets.forEach(el => revealObserver.observe(el));
   }
+
+  /* ─── HAMBURGER EVENTS ────────────────────── */
+  hamburgerBtn?.addEventListener('click', openMenu);
+  closeMenuBtn?.addEventListener('click', closeMenu);
+  mobileMenu?.addEventListener('click', e => {
+    if (!e.target.closest('.mobile-menu-inner')) closeMenu();
+  });
 
   /* ─── INIT ────────────────────────────────── */
   el('year').textContent = new Date().getFullYear();
