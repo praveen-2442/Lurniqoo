@@ -77,12 +77,10 @@
   setInterval(updateClock, 30000);
 
   /* ─── SET ACTIVE VIEW ─────────────────────── */
-  function setActiveView(viewId, sideRoute) {
+  function setActiveView(viewId, sideRoute, skipScroll) {
     ALL_VIEWS.forEach(id => {
       const v = el(id);
-      if (v) {
-        v.classList.toggle('active', id === viewId);
-      }
+      if (v) v.classList.toggle('active', id === viewId);
     });
 
     const isHome = viewId === 'view-home';
@@ -91,7 +89,7 @@
     updateSideLink(sideRoute || null);
     updateMobileActiveLink(sideRoute || null);
     closeMenu();
-    scrollToTop();
+    if (!skipScroll) scrollToTop();
   }
 
   /* ─── NAV ACTIONS ─────────────────────────── */
@@ -110,36 +108,51 @@
   }
 
   function goANU() {
-    setActiveView('view-anu', 'syllabus');
+    setActiveView('view-anu', 'syllabus', true);
+    window.scrollTo(0, 0);
     setTimeout(() => {
       el('open-btech')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 50);
+    }, 120);
   }
 
   function goBTech() {
-    setActiveView('view-btech', 'syllabus');
+    setActiveView('view-btech', 'syllabus', true);
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      el('view-btech')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
   }
 
   function goDept(dept) {
     state.dept = dept;
     el('dept-year-heading').textContent = dept + ' — Select Year';
-    // reset radios
     document.querySelectorAll('input[name="year"]').forEach(r => r.checked = false);
-    setActiveView('view-dept-year', 'syllabus');
+    setActiveView('view-dept-year', 'syllabus', true);
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      el('dept-year-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
   }
 
   function goSem() {
     el('dept-sem-heading').textContent = state.dept;
     el('dept-year-label').textContent = state.year + ' Year';
-    // reset radios
     document.querySelectorAll('input[name="semester"]').forEach(r => r.checked = false);
-    setActiveView('view-dept-sem', 'syllabus');
+    setActiveView('view-dept-sem', 'syllabus', true);
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      el('dept-sem-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
   }
 
   function goSubjects() {
     el('subjects-title').textContent =
       `${state.dept} — ${state.year} Year — Sem ${state.sem}`;
-    setActiveView('view-dept-subjects', 'syllabus');
+    setActiveView('view-dept-subjects', 'syllabus', true);
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+      el('subjects-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
     renderSubjects();
   }
 
