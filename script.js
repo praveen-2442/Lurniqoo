@@ -6,7 +6,11 @@
   const qs  = sel => document.querySelector(sel);
 
   function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
   }
 
   /* ─── STATE ───────────────────────────────── */
