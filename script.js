@@ -6,11 +6,7 @@
   const qs  = sel => document.querySelector(sel);
 
   function scrollToTop() {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    });
+    window.scrollTo(0, 0);
   }
 
   /* ─── STATE ───────────────────────────────── */
@@ -116,9 +112,8 @@
   function goANU() {
     setActiveView('view-anu', 'syllabus');
     setTimeout(() => {
-      const btn = el('open-btech');
-      if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 80);
+      el('open-btech')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
   }
 
   function goBTech() {
