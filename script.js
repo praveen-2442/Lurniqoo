@@ -115,6 +115,10 @@
 
   function goANU() {
     setActiveView('view-anu', 'syllabus');
+    setTimeout(() => {
+      const btn = el('open-btech');
+      if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
   }
 
   function goBTech() {
