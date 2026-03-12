@@ -95,8 +95,6 @@
   /* ─── NAV ACTIONS ─────────────────────────── */
   function goHome() {
     setActiveView('view-home', 'home');
-    // Reset nav brand — observer will take over
-    document.querySelectorAll('.nav-brand').forEach(b => b.classList.remove('logo-visible'));
   }
 
   function goAbout() {
@@ -351,28 +349,8 @@
     if (!e.target.closest('.mobile-menu-inner')) closeMenu();
   });
 
-  /* ─── LOGO SCROLL OBSERVER ────────────────── */
-  function initLogoObserver() {
-    const mainLogo  = el('main-logo');
-    const navBrands = document.querySelectorAll('.nav-brand');
-    if (!mainLogo) return;
-
-    const observer = new IntersectionObserver(([entry]) => {
-      // When main logo is NOT visible → show nav logo
-      const show = !entry.isIntersecting;
-      navBrands.forEach(b => b.classList.toggle('logo-visible', show));
-    }, {
-      // Fire when logo touches the very top of the viewport (the header area)
-      rootMargin: '-60px 0px 0px 0px',
-      threshold: 0
-    });
-
-    observer.observe(mainLogo);
-  }
-
   /* ─── INIT ────────────────────────────────── */
   el('year').textContent = new Date().getFullYear();
   setActiveView('view-home', 'home');
-  initLogoObserver();
 
 })();

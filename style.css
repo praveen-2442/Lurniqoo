@@ -123,24 +123,6 @@ h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.2; }
   gap: .6rem;
   text-decoration: none;
   color: var(--text);
-  opacity: 0;
-  transform: translateY(-6px);
-  transition: opacity .3s ease, transform .3s ease;
-  pointer-events: none;
-}
-
-/* Shown when main logo has scrolled past the header */
-.nav-brand.logo-visible {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* Always visible when NOT on home view */
-body.mode-anu .nav-brand {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
 }
 
 .nav-logo {
