@@ -1,356 +1,117 @@
-(function () {
-  'use strict';
+/* STATE */
+const state = {
+  dept: null,
+  year: null,
+  sem: null,
+  user: null
+};
 
-  /* ─── HELPERS ─────────────────────────────── */
-  const el  = id => document.getElementById(id);
-  const qs  = sel => document.querySelector(sel);
+/* FIREBASE CONFIG */
+firebase.initializeApp({
+  apiKey: "YOUR_KEY",
+  authDomain: "YOUR_DOMAIN",
+  projectId: "YOUR_ID"
+});
 
-  function scrollToTop() {
-    window.scrollTo(0, 0);
+const auth = firebase.auth();
+
+/* AUTH STATE */
+auth.onAuthStateChanged(user => {
+  state.user = user;
+  if (user) {
+    document.getElementById("auth-modal").classList.add("hidden");
   }
+});
 
-  /* ─── STATE ───────────────────────────────── */
-  const state = { dept: null, year: null, sem: null };
+/* AUTH EVENTS */
+document.getElementById("login-btn").onclick = () => {
+  document.getElementById("auth-modal").classList.remove("hidden");
+};
 
-  /* ─── MOBILE MENU ─────────────────────────── */
-  const hamburgerBtn = el('hamburger-btn');
-  const closeMenuBtn = el('close-menu-btn');
-  const mobileMenu   = el('mobile-menu');
+document.getElementById("login-submit").onclick = () => {
+  auth.signInWithEmailAndPassword(
+    email.value,
+    password.value
+  ).catch(e => authError.innerText = e.message);
+};
 
-  function openMenu() {
-    mobileMenu.classList.add('open');
-    mobileMenu.setAttribute('aria-hidden', 'false');
-    hamburgerBtn?.setAttribute('aria-expanded', 'true');
-    document.body.style.overflow = 'hidden';
-  }
+document.getElementById("signup-submit").onclick = () => {
+  auth.createUserWithEmailAndPassword(
+    email.value,
+    password.value
+  ).catch(e => authError.innerText = e.message);
+};
 
-  function closeMenu() {
-    mobileMenu?.classList.remove('open');
-    mobileMenu?.setAttribute('aria-hidden', 'true');
-    hamburgerBtn?.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-  }
+/* NAVIGATION */
+function show(view) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById(view).classList.add("active");
+}
 
-  function updateMobileActiveLink(route) {
-    document.querySelectorAll('.mobile-nav-link').forEach(a => {
-      a.classList.toggle('mob-active', a.dataset.route === route);
-    });
-  }
+document.getElementById("start").onclick = () => show("dept");
 
-  /* ─── VIEW IDs ────────────────────────────── */
-  const ALL_VIEWS = [
-    'view-home',
-    'view-anu',
-    'view-btech',
-    'view-dept-year',
-    'view-dept-sem',
-    'view-dept-subjects',
-    'view-about',
-    'view-notifications'
-  ];
-
-  /* ─── ACTIVE SIDE LINK ────────────────────── */
-  function updateSideLink(route) {
-    document.querySelectorAll('.side-link').forEach(a => {
-      a.classList.toggle('active', a.dataset.route === route);
-    });
-    // sync mobile bottom nav
-    document.querySelectorAll('.mob-item').forEach(a => {
-      a.classList.toggle('mob-active', a.dataset.mob === route);
-    });
-    // sync desktop topbar nav links
-    document.querySelectorAll('.nav-link').forEach(a => {
-      a.classList.toggle('active', a.dataset.route === route);
-    });
-  }
-
-  /* ─── LIVE CLOCK ─────────────────────────── */
-  function updateClock() {
-    const t = el('status-time');
-    if (!t) return;
-    const now = new Date();
-    const h   = now.getHours();
-    const m   = String(now.getMinutes()).padStart(2, '0');
-    t.textContent = h + ':' + m;
-  }
-  updateClock();
-  setInterval(updateClock, 30000);
-
-  /* ─── SET ACTIVE VIEW ─────────────────────── */
-  function setActiveView(viewId, sideRoute, skipScroll) {
-    ALL_VIEWS.forEach(id => {
-      const v = el(id);
-      if (v) v.classList.toggle('active', id === viewId);
-    });
-
-    const isHome = viewId === 'view-home';
-    document.body.classList.toggle('mode-anu', !isHome);
-
-    updateSideLink(sideRoute || null);
-    updateMobileActiveLink(sideRoute || null);
-    closeMenu();
-    if (!skipScroll) scrollToTop();
-  }
-
-  /* ─── NAV ACTIONS ─────────────────────────── */
-  function goHome() {
-    setActiveView('view-home', 'home');
-  }
-
-  function goAbout() {
-    setActiveView('view-about', 'about');
-    initReveal();
-  }
-
-  function goNotifications() {
-    setActiveView('view-notifications', 'notifications');
-    initReveal();
-  }
-
-  function goANU() {
-    setActiveView('view-anu', 'syllabus', true);
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      el('open-btech')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 120);
-  }
-
-  function goBTech() {
-    setActiveView('view-btech', 'syllabus', true);
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      el('view-btech')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 120);
-  }
-
-  function goDept(dept) {
-    state.dept = dept;
-    el('dept-year-heading').textContent = dept + ' — Select Year';
-    document.querySelectorAll('input[name="year"]').forEach(r => r.checked = false);
-    setActiveView('view-dept-year', 'syllabus', true);
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      el('dept-year-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 120);
-  }
-
-  function goSem() {
-    el('dept-sem-heading').textContent = state.dept;
-    el('dept-year-label').textContent = state.year + ' Year';
-    document.querySelectorAll('input[name="semester"]').forEach(r => r.checked = false);
-    setActiveView('view-dept-sem', 'syllabus', true);
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      el('dept-sem-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 120);
-  }
-
-  function goSubjects() {
-    el('subjects-title').textContent =
-      `${state.dept} — ${state.year} Year — Sem ${state.sem}`;
-    setActiveView('view-dept-subjects', 'syllabus', true);
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      el('subjects-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 120);
-    renderSubjects();
-  }
-
-  /* ─── SUBJECT DATA ────────────────────────── */
-  const SUBJECT_URLS = {
-    'AIML|1st|1': {
-      'Mathematics – I':       '',
-      'Physics':               '',
-      'Basic Electrical Engg': '',
-      'Engineering Graphics':  '',
-      'C Programming':         ''
-    },
-    'AIML|1st|2': {
-      'Mathematics – II': '',
-      'Chemistry':        '',
-      'English':          '',
-      'Digital Electronics': '',
-      'Python':           '',
-      'Environmental Science': ''
-    },
-    'CSE|1st|1': {
-      'Mathematics – I':       '',
-      'Physics':               '',
-      'Basic Electrical Engg': '',
-      'Engineering Graphics':  '',
-      'C Programming':         ''
-    },
-    'CSE|1st|2': {
-      'Mathematics – II': '',
-      'Chemistry':        '',
-      'English':          '',
-      'Digital Electronics': '',
-      'Python':           '',
-      'Environmental Science': ''
-    }
+document.querySelectorAll(".dept-btn").forEach(btn => {
+  btn.onclick = () => {
+    state.dept = btn.dataset.dept;
+    show("year");
   };
+});
 
-  function renderSubjects() {
-    const grid = el('subjects-grid');
-    grid.innerHTML = '';
+document.getElementById("next-year").onclick = () => {
+  const y = document.querySelector("input[name=year]:checked");
+  if (!y) return alert("Select year");
+  state.year = y.value;
+  show("sem");
+};
 
-    const key      = `${state.dept}|${state.year}|${state.sem}`;
-    const subjects = SUBJECT_URLS[key];
+document.getElementById("next-sem").onclick = () => {
+  const s = document.querySelector("input[name=sem]:checked");
+  if (!s) return alert("Select sem");
+  state.sem = s.value;
+  show("subjects");
+  renderSubjects();
+};
 
-    if (!subjects || Object.keys(subjects).length === 0) {
-      grid.innerHTML =
-        '<p class="no-subjects">No subjects available yet for this selection.</p>';
-      return;
-    }
+/* SUBJECT DATA */
+const SUBJECTS = {
+  "AIML|1|1": {
+    "Math": "",
+    "Physics": ""
+  }
+};
 
-    Object.entries(subjects).forEach(([name, url]) => {
-      const btn = document.createElement('button');
-      btn.className   = 'subject-card';
-      btn.textContent = name;
-      btn.dataset.url = url;
-      grid.appendChild(btn);
-    });
+/* RENDER SUBJECTS */
+function renderSubjects() {
+  const grid = document.getElementById("subjects-grid");
+  grid.innerHTML = "";
+
+  const key = `${state.dept}|${state.year}|${state.sem}`;
+  const subs = SUBJECTS[key];
+
+  if (!subs) {
+    grid.innerHTML = "No subjects available";
+    return;
   }
 
-  /* ─── SUBJECT VIEWER ──────────────────────── */
-  function openSubjectViewer(name, url) {
-    const viewer = el('subject-viewer');
-    el('subject-viewer-title').textContent = name;
-    el('subject-viewer-frame').src = url || 'about:blank';
-    viewer.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-  }
+  Object.entries(subs).forEach(([name, url]) => {
+    const div = document.createElement("div");
+    div.className = "subject-card";
+    div.innerText = name;
 
-  function closeSubjectViewer() {
-    const viewer = el('subject-viewer');
-    viewer.setAttribute('aria-hidden', 'true');
-    el('subject-viewer-frame').src = 'about:blank';
-    document.body.style.overflow = '';
-  }
+    div.onclick = () => {
+      if (!state.user) {
+        document.getElementById("auth-modal").classList.remove("hidden");
+        return;
+      }
 
-  /* ─── CLICK ROUTER ────────────────────────── */
-  document.addEventListener('click', e => {
-    const t = e.target;
+      if (!url) {
+        alert("Content not uploaded yet");
+        return;
+      }
 
-    /* — data-route links (topbar & sidebar) — */
-    const routeEl = t.closest('[data-route]');
-    if (routeEl) {
-      const r = routeEl.dataset.route;
-      if (r === 'home')          { e.preventDefault(); goHome();          return; }
-      if (r === 'about')         { e.preventDefault(); goAbout();         return; }
-      if (r === 'notifications') { e.preventDefault(); goNotifications(); return; }
-      if (r === 'syllabus')      { e.preventDefault(); goANU();           return; }
-    }
+      alert("Open PDF here");
+    };
 
-    /* — Portal buttons — */
-    if (t.closest('#btn-anu'))    { e.preventDefault(); goANU();    return; }
-    if (t.closest('#open-btech')) { e.preventDefault(); goBTech();  return; }
-
-    /* — Department buttons — */
-    const deptBtn = t.closest('.dep-btn');
-    if (deptBtn) {
-      e.preventDefault();
-      goDept(deptBtn.dataset.dept || deptBtn.textContent.trim());
-      return;
-    }
-
-    /* — Subject cards — */
-    const subCard = t.closest('.subject-card');
-    if (subCard) {
-      openSubjectViewer(subCard.textContent.trim(), subCard.dataset.url);
-      return;
-    }
-
-    /* — Back buttons — */
-    if (t.closest('#back-anu'))       { e.preventDefault(); goANU();       return; }
-    if (t.closest('#back-btech'))     { e.preventDefault(); goBTech();     return; }
-    if (t.closest('#back-dept-year')) { e.preventDefault(); setActiveView('view-dept-year', 'syllabus'); return; }
-    if (t.closest('#back-dept-sem'))  { e.preventDefault(); setActiveView('view-dept-sem', 'syllabus');  return; }
-
-    /* — Close subject viewer — */
-    if (t.closest('#close-subject-viewer')) { closeSubjectViewer(); return; }
+    grid.appendChild(div);
   });
-
-  /* Close viewer with Escape key */
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeSubjectViewer();
-  });
-
-  /* ─── FORMS ───────────────────────────────── */
-  el('dept-year-form')?.addEventListener('submit', e => {
-    e.preventDefault();
-    const v = qs('input[name="year"]:checked');
-    if (!v) { showFormError('Please select a year to continue.'); return; }
-    state.year = { 1: '1st', 2: '2nd', 3: '3rd', 4: '4th' }[v.value];
-    goSem();
-  });
-
-  el('dept-sem-form')?.addEventListener('submit', e => {
-    e.preventDefault();
-    const v = qs('input[name="semester"]:checked');
-    if (!v) { showFormError('Please select a semester to continue.'); return; }
-    state.sem = v.value;
-    goSubjects();
-  });
-
-  function showFormError(msg) {
-    // non-blocking toast instead of alert()
-    const existing = document.querySelector('.form-toast');
-    if (existing) existing.remove();
-
-    const toast = document.createElement('div');
-    toast.className = 'form-toast';
-    toast.textContent = msg;
-    Object.assign(toast.style, {
-      position:     'fixed',
-      bottom:       '24px',
-      left:         '50%',
-      transform:    'translateX(-50%)',
-      background:   'rgba(20,30,55,.95)',
-      border:       '1px solid rgba(91,142,240,.35)',
-      color:        '#e4e9f5',
-      padding:      '.65rem 1.2rem',
-      borderRadius: '10px',
-      fontSize:     '.88rem',
-      fontWeight:   '600',
-      zIndex:       '9999',
-      backdropFilter: 'blur(14px)',
-      boxShadow:    '0 8px 24px rgba(0,0,0,.4)',
-      pointerEvents: 'none'
-    });
-
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
-
-  /* ─── SCROLL REVEAL ───────────────────────── */
-  let revealObserver = null;
-
-  function initReveal() {
-    if (revealObserver) revealObserver.disconnect();
-
-    const targets = document.querySelectorAll('.reveal');
-
-    revealObserver = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        }
-      });
-    }, { threshold: 0.12 });
-
-    targets.forEach(el => revealObserver.observe(el));
-  }
-
-  /* ─── HAMBURGER EVENTS ────────────────────── */
-  hamburgerBtn?.addEventListener('click', openMenu);
-  closeMenuBtn?.addEventListener('click', closeMenu);
-  mobileMenu?.addEventListener('click', e => {
-    if (!e.target.closest('.mobile-menu-inner')) closeMenu();
-  });
-
-  /* ─── INIT ────────────────────────────────── */
-  el('year').textContent = new Date().getFullYear();
-  setActiveView('view-home', 'home');
-
-})();
+}
